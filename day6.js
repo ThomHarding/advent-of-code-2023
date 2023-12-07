@@ -28,15 +28,16 @@ distances.forEach(e => {
     overallDistance += e;
 });
 console.log(overallDistance, overallTime);
-let totalWays = 0;
+let lowestVelocity = 0;
 //we have a number of ways to do the race up to the race's duration
 for (let t = 1; t < overallTime; t++) {
     let velocity = t; //for clarity
     let time = overallTime - t;
+    //since we know it's velocity * time, once we know the lowest velocity
+    //we know that the highest velocity will be what we previously uesd as the time value
     if (overallDistance < (velocity * time)) {
-        totalWays++;
+        lowestVelocity = velocity;
+        break;
     }
 }
-
-console.log('distances', distances);
-console.log('final value: ', totalWays);
+console.log('total ways', 0 - (lowestVelocity - (overallTime - lowestVelocity + 1)));
