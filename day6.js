@@ -1,43 +1,177 @@
-const {readFileSync, promises: fsPromises} = require('fs');
+"use strict"
 
-// ✅ read file SYNCHRONOUSLY
-function syncReadFile(filename) {
-  const contents = readFileSync(filename, 'utf-8');
+// solving the puzzle takes (my computer) 0.033s
 
-  const arr = contents.split(/\r?\n/);
+const DATA = [ ]
 
-//   console.log(arr); // 👉️ ['One', 'Two', 'Three', 'Four']
+const STRENGTHS = "AKQJT98765432"
+const strengths = "abcdefghijklm".split("").reverse().join("")
 
-  return arr;
+const highcards = [ ]
+const onepairs = [ ]
+const twopairs = [ ]
+const threesomes = [ ]
+const fullhouses = [ ]
+const foursomes = [ ]
+const fivesomes = [ ]
+
+const allLists =  [ highcards, onepairs, twopairs, threesomes, fullhouses, foursomes, fivesomes ]
+
+
+function main() {
+
+    processInput()
+        
+    for (const list of allLists) { 
+    
+        for (let n = 0; n < STRENGTHS.length; n++) { list.push([ ]) } // one sublist for each label
+    }
+    
+    for (const data of DATA) { 
+    
+        const kind = getKind(data) 
+    
+        if (kind == "highcard")  { placeData(data, highcards);  continue }    
+        if (kind == "onepair")   { placeData(data, onepairs);   continue }      
+        if (kind == "twopairs")  { placeData(data, twopairs);   continue }            
+        if (kind == "threesome") { placeData(data, threesomes); continue }    
+        if (kind == "fullhouse") { placeData(data, fullhouses); continue }          
+        if (kind == "foursome")  { placeData(data, foursomes);  continue }          
+        if (kind == "fivesome")  { placeData(data, fivesomes);  continue }  
+    }
+
+    for (const list of allLists) { 
+    
+        for (const sublist of list) { sort(sublist) }
+    }
+
+    let totalWinnings = 0
+    
+    let rank = 0 // base one
+    
+    for (const list of allLists) { 
+    
+        for (const sublist of list) {
+        
+            for (const data of sublist) {
+            
+                rank += 1
+                
+                totalWinnings += rank * data.bid               
+            }
+        } 
+    }
+    
+    console.log("the answer is", totalWinnings)   
 }
 
-let file = syncReadFile('./input6.txt');
-let waysToWin = [];
-//first step: parse out useful information
-let times =  file[0].split(':')[1].split(/\s+/);
-times.shift(); //the first item is empty due to how split works with the whitespace
-let overallTime = '';
-times.forEach(e => {
-    overallTime += e;
-});
-let distances =  file[1].split(':')[1].split(/\s+/);
-//times and distances are still arrays of strings but that's fine
-distances.shift();
-let overallDistance = '';
-distances.forEach(e => {
-    overallDistance += e;
-});
-console.log(overallDistance, overallTime);
-let lowestVelocity = 0;
-//we have a number of ways to do the race up to the race's duration
-for (let t = 1; t < overallTime; t++) {
-    let velocity = t; //for clarity
-    let time = overallTime - t;
-    //since we know it's velocity * time, once we know the lowest velocity
-    //we know that the highest velocity will be what we previously uesd as the time value
-    if (overallDistance < (velocity * time)) {
-        lowestVelocity = velocity;
-        break;
+///////////////////////////////////////////////////////////
+
+function processInput() {
+
+    const input = Deno.readTextFileSync("input7.txt").trim()
+        
+    const lines = input.split("\n")
+    
+    for (const line of lines) { 
+    
+        const tokens = line.trim().split(" ")
+        
+        const original = tokens.shift()
+        
+        const hand = convertHand(original)
+        
+        const bid = parseInt(tokens.shift())
+        
+        DATA.push({ "hand": hand, "bid": bid })
     }
 }
-console.log('total ways', 0 - (lowestVelocity - (overallTime - lowestVelocity + 1)));
+
+function convertHand(original) { // for a faster sorting
+
+    let converted = ""
+    
+    for (const char of original) {
+    
+        const index = STRENGTHS.indexOf(char)
+        
+        converted += strengths[index]
+    }
+    return converted
+}
+
+function getKind(data) {
+
+    const cards = { }
+    
+    for (const char of data.hand) {
+    
+        if (cards[char] == undefined) { cards[char] = 0 }
+        
+        cards[char] += 1
+    }
+    
+    const labels = Object.keys(cards)
+    
+    if (labels.length == 5) { return "highcard" }
+
+    if (labels.length == 4) { return "onepair" }
+    
+    if (labels.length == 3) { 
+    
+        if (cards[labels[0]] == 3) { return "threesome" }
+        if (cards[labels[1]] == 3) { return "threesome" }
+        if (cards[labels[2]] == 3) { return "threesome" }
+
+        return "twopairs" 
+    }
+    
+    if (labels.length == 2) { 
+    
+        if (cards[labels[0]] == 4) { return "foursome" }
+        if (cards[labels[1]] == 4) { return "foursome" }
+        if (cards[labels[2]] == 4) { return "foursome" }
+        if (cards[labels[3]] == 4) { return "foursome" }
+
+        return "fullhouse" 
+    }
+    
+    return "fivesome"
+
+}
+
+///////////////////////////////////////////////////////////
+
+function placeData(data, list) {
+
+    const index = STRENGTHS.length - 1 - strengths.indexOf(data.hand[0])
+    
+    list[index].push(data)
+}
+
+function sort(list) {
+
+    let n = -1
+    
+    while (true) {
+
+        n += 1
+        
+        const current = list[n]
+                
+        const next = list[n + 1]
+        
+        if (next == undefined) { return }
+        
+        if (current.hand > next.hand) {
+
+            list[n] = next
+            
+            list[n + 1] = current
+            
+            n = -1
+        }
+    }
+}
+
+main()
