@@ -83,7 +83,7 @@ function testForFullHouse(cards) {
             hasTwo = key;
         }
     });
-    if ((hasThree != null) && hasTwo != null) {
+    if ((hasThree != null) && (hasTwo != null)) {
     return [hasTwo, hasThree];
     }
     return false;
@@ -151,9 +151,9 @@ for (let i = 0; i < hands.length; i++) { //for each hand
     } else if (testForFourOfAKind(hands[i]) != false) {
         fourOfAKinds.push([hands[i], bids[i]]);
     } else if (testForFullHouse(hands[i]) != false) {
-        threeOfAKinds.push([hands[i], bids[i]]);
-    } else if (testForThreeOfAKind(hands[i]) != false) {
         fullHouses.push([hands[i], bids[i]]);
+    } else if (testForThreeOfAKind(hands[i]) != false) {
+        threeOfAKinds.push([hands[i], bids[i]]);
     } else if (testForTwoPair(hands[i]) != false) {
         twoPairs.push([hands[i], bids[i]]);
     } else if (testForOnePair(hands[i]) != false) {
@@ -161,13 +161,6 @@ for (let i = 0; i < hands.length; i++) { //for each hand
     } else {
         highCards.push([hands[i], bids[i]]);
     }
-    // console.log('five', testForFiveOfAKind(hands[i])); //bool of real, value of card
-    // console.log('four', testForFourOfAKind(hands[i]));
-    // console.log('full house', testForFullHouse(hands[i]));
-    // console.log('three', testForThreeOfAKind(hands[i]));
-    // console.log('two pair', testForTwoPair(hands[i]));
-    // console.log('one pair', testForOnePair(hands[i]));
-    // console.log('highest', highestCard(hands[i]));
 }
 
 function compareCards(a, b) {
@@ -176,7 +169,6 @@ function compareCards(a, b) {
 
 function compareHands(a, b) {
     for (let i = 0; i < 5; i++) {
-        // console.log('cock', a, b, compareCards(a[0][i], b[0][i]));
         if (compareCards(a[0][i], b[0][i]) != 0) {
             return (compareCards(a[0][i], b[0][i]));
         }
@@ -191,45 +183,35 @@ highCards.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-// console.log('unending nightmare', currRank, totalWinnings);
 onePairs.sort(compareHands);
 onePairs.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-// console.log('unending nightmare', currRank, totalWinnings);
 twoPairs.sort(compareHands);
 twoPairs.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-// console.log('unending nightmare', currRank, totalWinnings);
 threeOfAKinds.sort(compareHands);
 threeOfAKinds.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-// console.log('unending nightmare', currRank, totalWinnings);
 fullHouses.sort(compareHands);
 fullHouses.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-// console.log('unending nightmare', currRank, totalWinnings);
 fourOfAKinds.sort(compareHands);
 fourOfAKinds.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-// console.log('unending nightmare', currRank, totalWinnings);
 fiveOfAKinds.sort(compareHands);
 fiveOfAKinds.forEach(function (hand) {
     currRank++;
     totalWinnings += (hand[1] * currRank);
 });
-
-// console.log('unending nightmare', currRank, totalWinnings);
-console.log('dios mio', fiveOfAKinds, fourOfAKinds, fullHouses, threeOfAKinds, twoPairs, onePairs, highCards);
 // console.log('hands:', hands, 'bids:', bids);
-console.log('rank', currRank);
 console.log('winnings: ', totalWinnings);
